@@ -5,7 +5,26 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon --exec babel-node src/server.js",
-    "start": "babel-node src/server.js"
+    "start": "babel-node src/server.js",
+    "lint-staged": "lint-staged"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*{.js,jsx,ts,tsx}": [
+      "import-sort --write",
+      "eslint --fix --quiet",
+      "prettier --write"
+    ]
+  },
+  "importSort": {
+    ".js,.jsx": {
+      "parser": "babylon",
+      "style": "module"
+    }
   },
   "dependencies": {
     "apollo-server": "^2.10.1",
@@ -22,6 +41,8 @@
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.3",
+    "import-sort-cli": "^6.0.0",
+    "import-sort-style-module": "^6.0.0",
     "lint-staged": "^10.0.8",
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1"
