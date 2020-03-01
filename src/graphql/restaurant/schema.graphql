@@ -1,0 +1,22 @@
+type Restaurant {
+  id: ID!
+  name: String!
+  address: String!
+  description: String
+  averagePrice: Int
+}
+
+input CreateRestaurantInput {
+  name: String!
+  address: String!
+  description: String
+  averagePrice: Int
+}
+
+type Query {
+  restaurants: [Restaurant]
+}
+
+type Mutation {
+  createRestaurant(payload: CreateRestaurantInput): Restaurant
+}
