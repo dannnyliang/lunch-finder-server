@@ -1,4 +1,5 @@
 import { ApolloError } from "apollo-server";
+
 import firebaseClient from "../../firebase-setup";
 
 const database = firebaseClient.database();
