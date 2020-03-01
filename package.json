@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec babel-node src/server.js",
     "start": "babel-node src/server.js",
+    "release": "standard-version",
     "lint-staged": "lint-staged"
   },
   "husky": {
@@ -46,6 +47,7 @@
     "import-sort-style-module": "^6.0.0",
     "lint-staged": "^10.0.8",
     "nodemon": "^2.0.2",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "standard-version": "^7.1.0"
   }
 }
