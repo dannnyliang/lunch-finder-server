@@ -19,7 +19,7 @@ const resolvers = {
   Query: {
     users: async (parent, variables, { db }) => {
       try {
-        const { query, page = 1, limit = 10, sort = "_id" } = variables;
+        const { query = {}, page = 1, limit = 10, sort = "_id" } = variables;
 
         const users = await db
           .collection("users")
