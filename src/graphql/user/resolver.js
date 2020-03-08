@@ -1,4 +1,5 @@
 import { ApolloError } from "apollo-server";
+import { ObjectId } from "mongodb";
 import { map, mergeDeepRight } from "ramda";
 
 import { insertIdField, removeObjectIdField } from "../utils";
@@ -56,7 +57,7 @@ const resolvers = {
 
         const originalDocument = await db
           .collection("users")
-          .find({ _id: id })
+          .find({ _id: ObjectId(id) })
           .toArray();
 
         const update = mergeDeepRight(
@@ -67,7 +68,7 @@ const resolvers = {
         const newDocument = await db
           .collection("users")
           .findOneAndUpdate(
-            { _id: id },
+            { _id: ObjectId(id) },
             { $set: update },
             { returnOriginal: false }
           );
@@ -81,7 +82,7 @@ const resolvers = {
       try {
         const { id } = variables;
 
-        await db.collection("users").findOneAndDelete({ _id: id });
+        await db.collection("users").findOneAndDelete({ _id: ObjectId(id) });
 
         return "Remove Completed!";
       } catch (error) {
