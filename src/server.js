@@ -19,7 +19,10 @@ const {
 
 const connect = async () => {
   const uri = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${DB_CLUSTERNAME}-5csrd.gcp.mongodb.net/test?retryWrites=true&w=majority`;
-  const client = await MongoClient.connect(uri, { useNewUrlParser: true });
+  const client = await MongoClient.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
 
   const db = client.db(DB_NAME);
   console.log(`🗄 Connected to DB: ${DB_NAME}`);
