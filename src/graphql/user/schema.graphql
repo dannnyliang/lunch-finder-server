@@ -1,23 +1,40 @@
+# ----- basic types -----
 type User {
-  fullName: String
-  email: String!
-  location: String
-  age: String
-  citizen: Boolean
+  id: ID!
+  name: String!
+  favorite: [String!]
+}
+
+type PagedUser {
+  docs: [User!]!
+  total: Int!
+  limit: Int!
+  page: Int!
+}
+
+# ----- input types -----
+input UsersQuery {
+  name: String
+  favorite: [String!]
 }
 
 input CreateUserInput {
-  fullName: String
-  email: String!
-  location: String
-  age: String
-  citizen: Boolean
+  name: String!
+  favorite: [String!]!
 }
 
+input UpdateUserInput {
+  name: String
+  favorite: [String!]
+}
+
+# ----- query and muate -----
 type Query {
-  users: [User]
+  users(query: UsersQuery, page: Int, limit: Int, sort: String): PagedUser
 }
 
 type Mutation {
   createUser(payload: CreateUserInput): User
+  updateUser(id: ID!, payload: UpdateUserInput): User
+  removeUser(id: ID!): String
 }

@@ -1,8 +1,23 @@
+# ----- basic types -----
 type Restaurant {
   id: ID!
   name: String!
   address: String!
   description: String
+  averagePrice: Int
+}
+
+type PagedRestaurant {
+  docs: [Restaurant!]!
+  total: Int!
+  limit: Int!
+  page: Int!
+}
+
+# ----- input types -----
+input RestaurantQuery {
+  name: String
+  address: String
   averagePrice: Int
 }
 
@@ -13,10 +28,25 @@ input CreateRestaurantInput {
   averagePrice: Int
 }
 
+input UpdateRestaurantInput {
+  name: String
+  address: String
+  description: String
+  averagePrice: Int
+}
+
+# ----- query and muate -----
 type Query {
-  restaurants: [Restaurant]
+  restaurants(
+    query: RestaurantQuery
+    page: Int
+    limit: Int
+    sort: String
+  ): PagedRestaurant
 }
 
 type Mutation {
   createRestaurant(payload: CreateRestaurantInput): Restaurant
+  updateRestaurant(id: ID!, payload: UpdateRestaurantInput): Restaurant
+  removeRestaurant(id: ID!): String
 }
