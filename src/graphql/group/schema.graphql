@@ -1,0 +1,44 @@
+# ----- basic types -----
+type Group {
+  id: ID!
+  name: String!
+  members: [User!]
+  options: [Restaurant!]
+}
+
+type PagedGroup {
+  docs: [Group!]!
+  total: Int!
+  limit: Int!
+  page: Int!
+}
+
+# ----- input types -----
+input GroupQuery {
+  name: String
+  members: [String!]
+  options: [String!]
+}
+
+input CreateGroupInput {
+  name: String!
+  members: [String!]
+  options: [String!]
+}
+
+input UpdateGroupInput {
+  name: String
+  members: [String!]
+  options: [String!]
+}
+
+# ----- query and muate -----
+type Query {
+  groups(query: GroupQuery, page: Int, limit: Int, sort: String): PagedGroup
+}
+
+type Mutation {
+  createGroup(payload: CreateGroupInput): Group
+  updateGroup(id: ID!, payload: UpdateGroupInput): Group
+  removeGroup(id: ID!): String
+}
