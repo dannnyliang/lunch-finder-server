@@ -34,7 +34,7 @@ type Query {
 }
 
 type Mutation {
-  createUser(payload: CreateUserInput): User
-  updateUser(id: ID!, payload: UpdateUserInput): User
+  createUser(payload: CreateUserInput!): User
+  updateUser(id: ID!, payload: UpdateUserInput!): User
   removeUser(id: ID!): String
 }

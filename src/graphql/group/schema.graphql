@@ -38,7 +38,7 @@ type Query {
 }
 
 type Mutation {
-  createGroup(payload: CreateGroupInput): Group
-  updateGroup(id: ID!, payload: UpdateGroupInput): Group
+  createGroup(payload: CreateGroupInput!): Group
+  updateGroup(id: ID!, payload: UpdateGroupInput!): Group
   removeGroup(id: ID!): String
 }

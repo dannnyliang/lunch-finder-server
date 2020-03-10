@@ -46,7 +46,7 @@ type Query {
 }
 
 type Mutation {
-  createRestaurant(payload: CreateRestaurantInput): Restaurant
-  updateRestaurant(id: ID!, payload: UpdateRestaurantInput): Restaurant
+  createRestaurant(payload: CreateRestaurantInput!): Restaurant
+  updateRestaurant(id: ID!, payload: UpdateRestaurantInput!): Restaurant
   removeRestaurant(id: ID!): String
 }
