@@ -1,0 +1,77 @@
+# ----- enums -----
+enum PollStatus {
+  # 正在投票
+  POLLING
+  # 已完成
+  COMPLETED
+  # 已廢棄
+  ABANDONED
+}
+
+# ----- basic types -----
+type Opinion {
+  member: User!
+  opinion: [Restaurant!]!
+}
+
+type Poll {
+  id: ID!
+  name: String!
+  members: [User!]!
+  options: [Restaurant!]!
+  opinions: [Opinion!]
+  status: PollStatus!
+  startTime: DateTime!
+  # parse to second
+  limitTime: Int
+  decision: Restaurant
+}
+
+type PagedPoll {
+  docs: [Poll!]!
+  total: Int!
+  limit: Int!
+  page: Int!
+}
+
+# ----- input types -----
+input PollsQuery {
+  name: String
+  status: PollStatus
+  decision: String
+  isTimeLimit: Boolean
+  isDecided: Boolean
+}
+
+input CreatePollInput {
+  name: String!
+  members: [String!]!
+  options: [String!]!
+  # parse to second
+  limitTime: Int
+}
+
+input UpdatePollInput {
+  name: String
+}
+
+input GiveOpinionInput {
+  member: String!
+  opinion: [String!]!
+}
+
+# ----- query and muate -----
+type Query {
+  polls(query: PollsQuery, page: Int, limit: Int, sort: String): PagedPoll
+  poll(id: ID!): Poll
+}
+
+type Mutation {
+  createPoll(payload: CreatePollInput!): Poll
+  updatePoll(id: ID!, payload: UpdatePollInput!): Poll
+  removePoll(id: ID!): String!
+
+  giveOpinion(id: ID!, payload: GiveOpinionInput!): Poll
+  directDecide(id: ID!, decision: String!): Poll
+  abandonPoll(id: ID!): String!
+}
