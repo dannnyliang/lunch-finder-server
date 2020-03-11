@@ -73,5 +73,5 @@ type Mutation {
 
   giveOpinion(id: ID!, payload: GiveOpinionInput!): Poll
   directDecide(id: ID!, decision: String!): Poll
-  abandonPoll(id: ID!): String!
+  abandonPoll(id: ID!): Poll!
 }
