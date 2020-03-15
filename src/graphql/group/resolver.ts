@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server";
-import { evolve, map, mergeDeepRight } from "ramda";
+import { map, mergeDeepRight } from "ramda";
 
 import {
   Group,
@@ -43,41 +43,34 @@ interface Resolver {
 
 const resolvers: Resolver = {
   Group: {
-    members: async (parent, _, { db }) => {
+    members: async (parent, _, { models: { Users } }) => {
       try {
         const memberIdList = parent.members;
-        console.log(memberIdList && typeof memberIdList[0]);
-        const members = await db
-          .collection("users")
-          .find({
-            _id: {
-              $in: map(
-                member => getObjectIdFromString(member.id),
-                memberIdList || []
-              )
-            }
-          })
-          .toArray();
+        const members = await Users.find({
+          _id: {
+            $in: map(
+              member => getObjectIdFromString(member.id),
+              memberIdList || []
+            )
+          }
+        }).toArray();
 
         return map(insertIdField, members);
       } catch (error) {
         throw new ApolloError(error.message);
       }
     },
-    options: async (parent, _, { db }) => {
+    options: async (parent, _, { models: { Restaurants } }) => {
       try {
         const optionIdList = parent.options;
-        const options = await db
-          .collection("restaurants")
-          .find({
-            _id: {
-              $in: map(
-                option => getObjectIdFromString(option.id),
-                optionIdList || []
-              )
-            }
-          })
-          .toArray();
+        const options = await Restaurants.find({
+          _id: {
+            $in: map(
+              option => getObjectIdFromString(option.id),
+              optionIdList || []
+            )
+          }
+        }).toArray();
 
         return map(insertIdField, options);
       } catch (error) {
@@ -86,13 +79,11 @@ const resolvers: Resolver = {
     }
   },
   Query: {
-    groups: async (_, variables, { db }) => {
+    groups: async (_, variables, { models: { Groups } }) => {
       try {
         const { query = {}, page = 1, limit = 10, sort = "_id" } = variables;
 
-        const groups = await db
-          .collection("groups")
-          .find(getGroupsFindQuery(query))
+        const groups = await Groups.find(getGroupsFindQuery(query))
           .sort({ [sort]: 1 })
           .skip((page - 1) * limit)
           .limit(limit)
@@ -110,37 +101,34 @@ const resolvers: Resolver = {
     }
   },
   Mutation: {
-    createGroup: async (_, variables, { db }) => {
+    createGroup: async (_, variables, { models: { Groups } }) => {
       try {
         const { payload } = variables;
-        const result = await db.collection("groups").insertOne(payload);
+        const result = await Groups.insertOne(payload);
 
         return insertIdField(result.ops[0]);
       } catch (error) {
         throw new ApolloError(error.message);
       }
     },
-    updateGroup: async (_, variables, { db }) => {
+    updateGroup: async (_, variables, { models: { Groups } }) => {
       try {
         const { id, payload } = variables;
 
-        const originalDocument = await db
-          .collection("groups")
-          .find({ _id: getObjectIdFromString(id) })
-          .toArray();
+        const originalDocument = await Groups.find({
+          _id: getObjectIdFromString(id)
+        }).toArray();
 
         const update = mergeDeepRight<Group, UpdateGroupInput>(
           removeObjectIdField(originalDocument[0]),
           payload
         );
 
-        const newDocument = await db
-          .collection("groups")
-          .findOneAndUpdate(
-            { _id: getObjectIdFromString(id) },
-            { $set: update },
-            { returnOriginal: false }
-          );
+        const newDocument = await Groups.findOneAndUpdate(
+          { _id: getObjectIdFromString(id) },
+          { $set: update },
+          { returnOriginal: false }
+        );
 
         if (!newDocument.value) {
           throw Error();
@@ -151,13 +139,11 @@ const resolvers: Resolver = {
         throw new ApolloError(error.message);
       }
     },
-    removeGroup: async (_, variables, { db }) => {
+    removeGroup: async (_, variables, { models: { Groups } }) => {
       try {
         const { id } = variables;
 
-        await db
-          .collection("groups")
-          .findOneAndDelete({ _id: getObjectIdFromString(id) });
+        await Groups.findOneAndDelete({ _id: getObjectIdFromString(id) });
 
         return "Remove Completed!";
       } catch (error) {
