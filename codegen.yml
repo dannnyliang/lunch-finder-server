@@ -1,0 +1,11 @@
+schema: ./src/**/*.graphql
+config:
+  maybeValue: T | undefined
+  objectIdType: ObjectId#mongodb
+  contextType: ../context#MyContext
+generates:
+  src/generated/types.ts:
+    plugins:
+      - typescript
+      - typescript-mongodb
+      - typescript-resolvers
