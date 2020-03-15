@@ -1,9 +1,10 @@
 import "dotenv/config";
 
+import { DIRECTIVES } from "@graphql-codegen/typescript-mongodb";
 import { ApolloServer } from "apollo-server-express";
 import cors from "cors";
 import express from "express";
-import { MongoClient } from "mongodb";
+import { Db, MongoClient } from "mongodb";
 
 import { resolvers, typeDefs } from "./graphql/index";
 
@@ -25,12 +26,12 @@ const connect = async () => {
   });
 
   const db = client.db(DB_NAME);
-  console.log(`🗄 Connected to DB: ${DB_NAME}`);
+  console.log(`🗄  Connected to DB: ${DB_NAME}`);
 
   return db;
 };
 
-const runApp = db => {
+const runApp = (db: Db) => {
   const app = express();
 
   app.use(
@@ -41,7 +42,7 @@ const runApp = db => {
   );
 
   const server = new ApolloServer({
-    typeDefs,
+    typeDefs: [DIRECTIVES, typeDefs],
     resolvers,
     context: {
       db
