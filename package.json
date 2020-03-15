@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "clean": "sudo rm -rf dist ./src/generated",
+    "clean": "rm -rf dist ./src/generated",
     "dev": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/server.ts",
     "predev": "yarn generate",
     "start": "node dist/server.js",
