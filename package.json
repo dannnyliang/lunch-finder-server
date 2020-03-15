@@ -4,8 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon --exec babel-node src/server.js",
-    "start": "babel-node src/server.js",
+    "clean": "sudo rm -rf dist ./src/generated",
+    "dev": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/server.ts",
+    "predev": "yarn generate",
+    "start": "node dist/server.js",
+    "build": "tsc && copyfiles -u 1 src/**/*.graphql dist",
+    "prebuild": "yarn clean && yarn generate",
+    "type-check": "tsc --noEmit",
+    "generate": "graphql-codegen",
     "release": "standard-version",
     "lint-staged": "lint-staged"
   },
@@ -22,6 +28,10 @@
     ]
   },
   "importSort": {
+    ".ts,.tsx": {
+      "parser": "typescript",
+      "style": "module"
+    },
     ".js,.jsx": {
       "parser": "babylon",
       "style": "module"
@@ -31,25 +41,40 @@
     "@babel/core": "^7.8.6",
     "@babel/node": "^7.8.4",
     "@babel/preset-env": "^7.8.6",
+    "@graphql-codegen/typescript-mongodb": "^1.13.0",
     "apollo-server": "^2.10.1",
     "apollo-server-express": "^2.10.1",
+    "copyfiles": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "graphql": "^14.6.0",
     "merge-graphql-schemas": "^1.7.6",
     "mongodb": "^3.5.4",
     "ramda": "^0.27.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.13.0",
+    "@graphql-codegen/typescript": "^1.13.0",
+    "@graphql-codegen/typescript-resolvers": "^1.13.0",
+    "@types/mongodb": "^3.5.2",
+    "@types/node": "^13.9.1",
+    "@types/ramda": "^0.26.43",
+    "@typescript-eslint/eslint-plugin": "^2.23.0",
+    "@typescript-eslint/parser": "^2.23.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.3",
     "import-sort-cli": "^6.0.0",
+    "import-sort-parser-babylon": "^6.0.0",
+    "import-sort-parser-typescript": "^6.0.0",
     "import-sort-style-module": "^6.0.0",
     "lint-staged": "^10.0.8",
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
-    "standard-version": "^7.1.0"
+    "standard-version": "^7.1.0",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.8.3"
   }
 }
