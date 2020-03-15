@@ -2,10 +2,23 @@ import { ApolloError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import { map, mergeDeepRight } from "ramda";
 
+import {
+  MutationResolvers,
+  QueryResolvers,
+  Restaurant,
+  RestaurantQuery,
+  UpdateRestaurantInput
+} from "../../generated/types";
 import { insertIdField, removeObjectIdField } from "../utils";
 
-const getRestaurantsFindQuery = payload => {
-  const query = {};
+interface RestaurantsFindQuery {
+  name?: RegExp;
+  address?: RegExp;
+  averagePrice?: { $gte: number };
+}
+
+const getRestaurantsFindQuery = (payload: RestaurantQuery) => {
+  const query: RestaurantsFindQuery = {};
   if (payload.name) {
     query.name = new RegExp(payload.name);
   }
@@ -18,7 +31,12 @@ const getRestaurantsFindQuery = payload => {
   return query;
 };
 
-const resolvers = {
+interface Resolver {
+  Query: QueryResolvers;
+  Mutation: MutationResolvers;
+}
+
+const resolvers: Resolver = {
   Query: {
     restaurants: async (parent, variables, { db }) => {
       try {
@@ -59,11 +77,11 @@ const resolvers = {
         const { id, payload } = variables;
 
         const originalDocument = await db
-          .collection("restaurants")
-          .find({ _id: ObjectId(id) })
+          .collection<Restaurant>("restaurants")
+          .find({ _id: new ObjectId(id) })
           .toArray();
 
-        const update = mergeDeepRight(
+        const update = mergeDeepRight<Restaurant, UpdateRestaurantInput>(
           removeObjectIdField(originalDocument[0]),
           payload
         );
@@ -71,7 +89,7 @@ const resolvers = {
         const newDocument = await db
           .collection("restaurants")
           .findOneAndUpdate(
-            { _id: ObjectId(id) },
+            { _id: new ObjectId(id) },
             { $set: update },
             { returnOriginal: false }
           );
@@ -87,7 +105,7 @@ const resolvers = {
 
         await db
           .collection("restaurants")
-          .findOneAndDelete({ _id: ObjectId(id) });
+          .findOneAndDelete({ _id: new ObjectId(id) });
 
         return "Remove Completed!";
       } catch (error) {

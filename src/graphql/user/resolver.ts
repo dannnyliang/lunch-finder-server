@@ -2,10 +2,22 @@ import { ApolloError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import { map, mergeDeepRight } from "ramda";
 
+import {
+  MutationResolvers,
+  QueryResolvers,
+  UpdateUserInput,
+  User,
+  UsersQuery
+} from "../../generated/types";
 import { insertIdField, removeObjectIdField } from "../utils";
 
-const getUsersFindQuery = payload => {
-  let query = {};
+interface UsersFindQuery {
+  name?: RegExp;
+  favorite?: { $in: string[] };
+}
+
+const getUsersFindQuery = (payload: UsersQuery) => {
+  const query: UsersFindQuery = {};
   if (payload.name) {
     query.name = new RegExp(payload.name);
   }
@@ -15,7 +27,12 @@ const getUsersFindQuery = payload => {
   return query;
 };
 
-const resolvers = {
+interface Resolver {
+  Query: QueryResolvers;
+  Mutation: MutationResolvers;
+}
+
+const resolvers: Resolver = {
   Query: {
     users: async (parent, variables, { db }) => {
       try {
@@ -56,11 +73,11 @@ const resolvers = {
         const { id, payload } = variables;
 
         const originalDocument = await db
-          .collection("users")
-          .find({ _id: ObjectId(id) })
+          .collection<User>("users")
+          .find({ _id: new ObjectId(id) })
           .toArray();
 
-        const update = mergeDeepRight(
+        const update = mergeDeepRight<User, UpdateUserInput>(
           removeObjectIdField(originalDocument[0]),
           payload
         );
@@ -68,7 +85,7 @@ const resolvers = {
         const newDocument = await db
           .collection("users")
           .findOneAndUpdate(
-            { _id: ObjectId(id) },
+            { _id: new ObjectId(id) },
             { $set: update },
             { returnOriginal: false }
           );
@@ -82,7 +99,9 @@ const resolvers = {
       try {
         const { id } = variables;
 
-        await db.collection("users").findOneAndDelete({ _id: ObjectId(id) });
+        await db
+          .collection("users")
+          .findOneAndDelete({ _id: new ObjectId(id) });
 
         return "Remove Completed!";
       } catch (error) {

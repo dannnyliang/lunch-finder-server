@@ -1,8 +1,8 @@
 # ----- basic types -----
-type User {
-  id: ID!
-  name: String!
-  favorite: [String!]
+type User @entity {
+  id: ID! @id
+  name: String! @column
+  favorite: [String!] @column
 }
 
 type PagedUser {
@@ -34,7 +34,7 @@ type Query {
 }
 
 type Mutation {
-  createUser(payload: CreateUserInput): User
-  updateUser(id: ID!, payload: UpdateUserInput): User
+  createUser(payload: CreateUserInput!): User
+  updateUser(id: ID!, payload: UpdateUserInput!): User
   removeUser(id: ID!): String
 }

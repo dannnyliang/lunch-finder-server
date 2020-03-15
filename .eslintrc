@@ -1,5 +1,7 @@
 {
-  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:@typescript-eslint/recommended"],
   "env": {
     "node": true,
     "es6": true
@@ -12,5 +14,8 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "rules": {}
+  "ignorePatterns": ["src/generated", "dist"],
+  "rules": {
+    "@typescript-eslint/explicit-function-return-type": "off"
+  }
 }
