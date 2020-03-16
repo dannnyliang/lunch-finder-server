@@ -2,7 +2,7 @@ schema: ./src/**/*.graphql
 config:
   maybeValue: T | undefined
   objectIdType: ObjectId#mongodb
-  contextType: ../context#MyContext
+  contextType: ../server#MyContext
 generates:
   src/generated/types.ts:
     plugins:
