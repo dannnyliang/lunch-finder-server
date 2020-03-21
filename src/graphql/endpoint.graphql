@@ -1,0 +1,32 @@
+type Query {
+  # ----- User -----
+  users(query: UsersQuery, page: Int, limit: Int, sort: String): PagedUser
+
+  # ----- Restaurant -----
+  restaurants(
+    query: RestaurantsQuery
+    page: Int
+    limit: Int
+    sort: String
+  ): PagedRestaurant
+
+  # ----- Group -----
+  groups(query: GroupsQuery, page: Int, limit: Int, sort: String): PagedGroup
+}
+
+type Mutation {
+  # ----- User -----
+  createUser(payload: CreateUserInput!): User
+  updateUser(id: ID!, payload: UpdateUserInput!): User
+  removeUser(id: ID!): String
+
+  # ----- Restaurant -----
+  createRestaurant(payload: CreateRestaurantInput!): Restaurant
+  updateRestaurant(id: ID!, payload: UpdateRestaurantInput!): Restaurant
+  removeRestaurant(id: ID!): String
+
+  # ----- Group -----
+  createGroup(payload: CreateGroupInput!): Group
+  updateGroup(id: ID!, payload: UpdateGroupInput!): Group
+  removeGroup(id: ID!): String
+}

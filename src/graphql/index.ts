@@ -16,11 +16,7 @@ export const allResolvers = glob
   .sync(`${__dirname}/**/resolver.[tj]s`)
   .map(resolver => require(resolver).default);
 
-export const typeDefs = gql(
-  mergeTypes(allTypes, {
-    all: true
-  })
-);
+export const typeDefs = gql(mergeTypes(allTypes));
 
 export const resolvers = mergeResolvers(allResolvers);
 

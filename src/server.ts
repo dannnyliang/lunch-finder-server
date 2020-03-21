@@ -1,6 +1,5 @@
 import "dotenv/config";
 
-import { DIRECTIVES } from "@graphql-codegen/typescript-mongodb";
 import { ApolloServer } from "apollo-server-express";
 import cors from "cors";
 import express from "express";
@@ -55,7 +54,7 @@ const runApp = async () => {
   };
 
   const server = new ApolloServer({
-    typeDefs: [DIRECTIVES, typeDefs],
+    typeDefs,
     resolvers,
     context,
     playground: true,

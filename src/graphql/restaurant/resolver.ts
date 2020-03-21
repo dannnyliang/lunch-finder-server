@@ -6,7 +6,7 @@ import {
   MutationResolvers,
   QueryResolvers,
   Restaurant,
-  RestaurantQuery,
+  RestaurantsQuery,
   UpdateRestaurantInput
 } from "../../generated/types";
 import { insertIdField, removeObjectIdField } from "../utils";
@@ -17,7 +17,7 @@ interface RestaurantsFindQuery {
   averagePrice?: { $gte: number };
 }
 
-const getRestaurantsFindQuery = (payload: RestaurantQuery) => {
+const getRestaurantsFindQuery = (payload: RestaurantsQuery) => {
   const query: RestaurantsFindQuery = {};
   if (payload.name) {
     query.name = new RegExp(payload.name);
