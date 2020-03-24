@@ -8,7 +8,7 @@
     "dev": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/server.ts",
     "predev": "yarn generate",
     "start": "node dist/server.js",
-    "build": "tsc && copyfiles -u 1 src/**/*.graphql dist",
+    "build": "tsc && copyfiles -u 1 src/**/*.graphql dist && copyfiles -u 1 src/graphql/**/*.graphql dist",
     "prebuild": "yarn clean && yarn generate",
     "type-check": "tsc --noEmit",
     "generate": "graphql-codegen",
