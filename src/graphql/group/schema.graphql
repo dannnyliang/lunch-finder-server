@@ -31,3 +31,14 @@ input UpdateGroupInput {
   members: [String!]
   options: [String!]
 }
+
+# ----- query and muate -----
+extend type Query {
+  groups(query: GroupsQuery, page: Int, limit: Int, sort: String): PagedGroup
+}
+
+extend type Mutation {
+  createGroup(payload: CreateGroupInput!): Group
+  updateGroup(id: ID!, payload: UpdateGroupInput!): Group
+  removeGroup(id: ID!): String
+}

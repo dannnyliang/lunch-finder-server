@@ -34,3 +34,19 @@ input UpdateRestaurantInput {
   description: String
   averagePrice: Int
 }
+
+# ----- query and muate -----
+extend type Query {
+  restaurants(
+    query: RestaurantsQuery
+    page: Int
+    limit: Int
+    sort: String
+  ): PagedRestaurant
+}
+
+extend type Mutation {
+  createRestaurant(payload: CreateRestaurantInput!): Restaurant
+  updateRestaurant(id: ID!, payload: UpdateRestaurantInput!): Restaurant
+  removeRestaurant(id: ID!): String
+}
