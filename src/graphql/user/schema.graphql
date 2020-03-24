@@ -29,11 +29,11 @@ input UpdateUserInput {
 }
 
 # ----- query and muate -----
-type Query {
+extend type Query {
   users(query: UsersQuery, page: Int, limit: Int, sort: String): PagedUser
 }
 
-type Mutation {
+extend type Mutation {
   createUser(payload: CreateUserInput!): User
   updateUser(id: ID!, payload: UpdateUserInput!): User
   removeUser(id: ID!): String

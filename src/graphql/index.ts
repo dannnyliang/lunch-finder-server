@@ -16,11 +16,7 @@ export const allResolvers = glob
   .sync(`${__dirname}/**/resolver.[tj]s`)
   .map(resolver => require(resolver).default);
 
-export const typeDefs = gql(
-  mergeTypes(allTypes, {
-    all: true
-  })
-);
+export const typeDefs = gql(mergeTypes(allTypes));
 
 export const resolvers = mergeResolvers(allResolvers);
 
@@ -31,7 +27,7 @@ export interface Models {
 }
 
 export const getModels = (db: Db): Models => ({
-  Users: db.collection("Users"),
-  Restaurants: db.collection("Restaurants"),
-  Groups: db.collection("Groups")
+  Users: db.collection("users"),
+  Restaurants: db.collection("restaurants"),
+  Groups: db.collection("groups")
 });

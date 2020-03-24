@@ -3,8 +3,8 @@ import { map, mergeDeepRight } from "ramda";
 
 import {
   Group,
-  GroupQuery,
   GroupResolvers,
+  GroupsQuery,
   MutationResolvers,
   QueryResolvers,
   UpdateGroupInput
@@ -21,7 +21,7 @@ interface GroupsFindQuery {
   options?: { $in: string[] };
 }
 
-const getGroupsFindQuery = (payload: GroupQuery) => {
+const getGroupsFindQuery = (payload: GroupsQuery) => {
   const query: GroupsFindQuery = {};
   if (payload.name) {
     query.name = new RegExp(payload.name);

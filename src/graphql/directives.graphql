@@ -1,0 +1,10 @@
+input AdditionalEntityFields {
+  path: String
+  type: String
+}
+
+directive @entity(embedded: Boolean, additionalFields: [AdditionalEntityFields]) on OBJECT
+directive @id on FIELD_DEFINITION
+directive @column(overrideType: String) on FIELD_DEFINITION
+directive @link(overrideType: String) on FIELD_DEFINITION
+directive @embedded on FIELD_DEFINITION

@@ -14,7 +14,7 @@ type PagedGroup {
 }
 
 # ----- input types -----
-input GroupQuery {
+input GroupsQuery {
   name: String
   members: [String!]
   options: [String!]
@@ -33,11 +33,11 @@ input UpdateGroupInput {
 }
 
 # ----- query and muate -----
-type Query {
-  groups(query: GroupQuery, page: Int, limit: Int, sort: String): PagedGroup
+extend type Query {
+  groups(query: GroupsQuery, page: Int, limit: Int, sort: String): PagedGroup
 }
 
-type Mutation {
+extend type Mutation {
   createGroup(payload: CreateGroupInput!): Group
   updateGroup(id: ID!, payload: UpdateGroupInput!): Group
   removeGroup(id: ID!): String
