@@ -1,6 +1,6 @@
 {
   "schema": {
-    "files": "src/**/*.graphql"
+    "files": ["src/generated/mergedSchema.graphql"]
   },
   "query": {
     "files": [
