@@ -27,7 +27,7 @@ export interface Models {
 }
 
 export const getModels = (db: Db): Models => ({
-  Users: db.collection("Users"),
-  Restaurants: db.collection("Restaurants"),
-  Groups: db.collection("Groups")
+  Users: db.collection("users"),
+  Restaurants: db.collection("restaurants"),
+  Groups: db.collection("groups")
 });
