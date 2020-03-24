@@ -16,8 +16,8 @@ const mockRestaurant: RestaurantDbObject = {
   address: "mock-address"
 };
 
-describe("Restaurant Query resolvers", () => {
-  it("should query restaurant list without variable correctly", async () => {
+describe("[Query.restaurants]", () => {
+  it("should return restaurant list without variable", async () => {
     const {
       testClient: { query },
       models: { Restaurants }
@@ -49,7 +49,7 @@ describe("Restaurant Query resolvers", () => {
     expect(data?.restaurants.docs[0]).toEqual(omit(["_id"], mockRestaurant));
   });
 
-  it("should query restaurant list with variable correctly", async () => {
+  it("should return restaurant list with variable", async () => {
     const {
       testClient: { query },
       models: { Restaurants }
@@ -119,8 +119,7 @@ describe("Restaurant Query resolvers", () => {
   });
 });
 
-describe("Restaurant Mutation resolvers", () => {
-  /** ----- Create ----- */
+describe("[Mutation.createRestaurant]", () => {
   it("should 'create' restaurant correctly", async () => {
     const {
       testClient: { mutate }
@@ -147,8 +146,9 @@ describe("Restaurant Mutation resolvers", () => {
     expect(create.errors).toBeUndefined();
     expect(create.data?.createRestaurant).toEqual(createPayload);
   });
+});
 
-  /** ----- Update ----- */
+describe("[Mutation.updateRestaurant]", () => {
   it("should 'update' restaurant correctly", async () => {
     const {
       testClient: { mutate },
@@ -182,8 +182,9 @@ describe("Restaurant Mutation resolvers", () => {
     expect(update.errors).toBeUndefined();
     expect(update.data?.updateRestaurant).toEqual(updatePayload);
   });
+});
 
-  /** ----- Remove ----- */
+describe("[Mutation.removeRestaurant]", () => {
   it("should 'remove' restaurant correctly", async () => {
     const {
       testClient: { mutate },
