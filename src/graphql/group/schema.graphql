@@ -16,20 +16,20 @@ type PagedGroup {
 # ----- input types -----
 input GroupsQuery {
   name: String
-  members: [String!]
-  options: [String!]
+  members: [ID!]
+  options: [ID!]
 }
 
 input CreateGroupInput {
   name: String!
-  members: [String!]
-  options: [String!]
+  members: [ID!]
+  options: [ID!]
 }
 
 input UpdateGroupInput {
   name: String
-  members: [String!]
-  options: [String!]
+  members: [ID!]
+  options: [ID!]
 }
 
 # ----- query and muate -----
