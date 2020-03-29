@@ -48,10 +48,7 @@ const resolvers: Resolver = {
         const memberIdList = parent.members;
         const members = await Users.find({
           _id: {
-            $in: map(
-              member => getObjectIdFromString(member.id),
-              memberIdList || []
-            )
+            $in: map(id => getObjectIdFromString(id), memberIdList || [])
           }
         }).toArray();
 
@@ -65,10 +62,7 @@ const resolvers: Resolver = {
         const optionIdList = parent.options;
         const options = await Restaurants.find({
           _id: {
-            $in: map(
-              option => getObjectIdFromString(option.id),
-              optionIdList || []
-            )
+            $in: map(id => getObjectIdFromString(id), optionIdList || [])
           }
         }).toArray();
 
