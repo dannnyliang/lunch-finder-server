@@ -1,9 +1,9 @@
 # ----- basic types -----
-type Group {
-  id: ID!
-  name: String!
-  members: [User!]
-  options: [Restaurant!]
+type Group @entity {
+  id: ID! @id
+  name: String! @column
+  members: [User!] @link
+  options: [Restaurant!] @link
 }
 
 type PagedGroup {
@@ -14,30 +14,30 @@ type PagedGroup {
 }
 
 # ----- input types -----
-input GroupQuery {
+input GroupsQuery {
   name: String
-  members: [String!]
-  options: [String!]
+  members: [ID!]
+  options: [ID!]
 }
 
 input CreateGroupInput {
   name: String!
-  members: [String!]
-  options: [String!]
+  members: [ID!]
+  options: [ID!]
 }
 
 input UpdateGroupInput {
   name: String
-  members: [String!]
-  options: [String!]
+  members: [ID!]
+  options: [ID!]
 }
 
 # ----- query and muate -----
-type Query {
-  groups(query: GroupQuery, page: Int, limit: Int, sort: String): PagedGroup
+extend type Query {
+  groups(query: GroupsQuery, page: Int, limit: Int, sort: String): PagedGroup
 }
 
-type Mutation {
+extend type Mutation {
   createGroup(payload: CreateGroupInput!): Group
   updateGroup(id: ID!, payload: UpdateGroupInput!): Group
   removeGroup(id: ID!): String

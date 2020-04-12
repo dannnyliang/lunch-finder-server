@@ -5,7 +5,7 @@ import cors from "cors";
 import express from "express";
 import { MongoClient } from "mongodb";
 
-import { resolvers, typeDefs } from "./graphql/index";
+import { Models, getModels, resolvers, typeDefs } from "./graphql/index";
 
 const {
   PORT,
@@ -17,6 +17,7 @@ const {
   DB_CLUSTERNAME
 } = process.env;
 
+// ----- DB connection -----
 const connect = async () => {
   const uri = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${DB_CLUSTERNAME}-5csrd.gcp.mongodb.net/test?retryWrites=true&w=majority`;
   const client = await MongoClient.connect(uri, {
@@ -25,12 +26,20 @@ const connect = async () => {
   });
 
   const db = client.db(DB_NAME);
-  console.log(`🗄 Connected to DB: ${DB_NAME}`);
+  console.log(`🗄  Connected to DB: ${DB_NAME}`);
 
   return db;
 };
 
-const runApp = db => {
+// ----- Express app and apollo server -----
+export interface MyContext {
+  models: Models;
+}
+
+const runApp = async () => {
+  const db = await connect();
+  const models = getModels(db);
+
   const app = express();
 
   app.use(
@@ -40,12 +49,14 @@ const runApp = db => {
     })
   );
 
+  const context: MyContext = {
+    models
+  };
+
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: {
-      db
-    },
+    context,
     playground: true,
     introspection: true
   });
@@ -59,9 +70,9 @@ const runApp = db => {
   return app;
 };
 
+// ----- Start server -----
 const startServer = async () => {
-  const db = await connect();
-  const app = runApp(db);
+  const app = await runApp();
 
   app.listen({ port: PORT || 4000 }, () => {
     console.log(`🚀 Apollo Server Ready on ${PROTOCAL}://${HOST}:${PORT}`);

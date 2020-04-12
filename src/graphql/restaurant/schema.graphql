@@ -1,10 +1,10 @@
 # ----- basic types -----
-type Restaurant {
-  id: ID!
-  name: String!
-  address: String!
-  description: String
-  averagePrice: Int
+type Restaurant @entity {
+  id: ID! @id
+  name: String! @column
+  address: String! @column
+  description: String @column
+  averagePrice: Int @column
 }
 
 type PagedRestaurant {
@@ -15,7 +15,7 @@ type PagedRestaurant {
 }
 
 # ----- input types -----
-input RestaurantQuery {
+input RestaurantsQuery {
   name: String
   address: String
   averagePrice: Int
@@ -36,16 +36,16 @@ input UpdateRestaurantInput {
 }
 
 # ----- query and muate -----
-type Query {
+extend type Query {
   restaurants(
-    query: RestaurantQuery
+    query: RestaurantsQuery
     page: Int
     limit: Int
     sort: String
   ): PagedRestaurant
 }
 
-type Mutation {
+extend type Mutation {
   createRestaurant(payload: CreateRestaurantInput!): Restaurant
   updateRestaurant(id: ID!, payload: UpdateRestaurantInput!): Restaurant
   removeRestaurant(id: ID!): String

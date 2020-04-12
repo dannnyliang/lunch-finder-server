@@ -2,10 +2,23 @@ import { ApolloError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import { map, mergeDeepRight } from "ramda";
 
+import {
+  MutationResolvers,
+  QueryResolvers,
+  Restaurant,
+  RestaurantsQuery,
+  UpdateRestaurantInput
+} from "../../generated/types";
 import { insertIdField, removeObjectIdField } from "../utils";
 
-const getRestaurantsFindQuery = payload => {
-  const query = {};
+interface RestaurantsFindQuery {
+  name?: RegExp;
+  address?: RegExp;
+  averagePrice?: { $gte: number };
+}
+
+const getRestaurantsFindQuery = (payload: RestaurantsQuery) => {
+  const query: RestaurantsFindQuery = {};
   if (payload.name) {
     query.name = new RegExp(payload.name);
   }
@@ -18,15 +31,20 @@ const getRestaurantsFindQuery = payload => {
   return query;
 };
 
-const resolvers = {
+interface Resolver {
+  Query: QueryResolvers;
+  Mutation: MutationResolvers;
+}
+
+const resolvers: Resolver = {
   Query: {
-    restaurants: async (parent, variables, { db }) => {
+    restaurants: async (parent, variables, { models: { Restaurants } }) => {
       try {
         const { query = {}, page = 1, limit = 10, sort = "_id" } = variables;
 
-        const restaurants = await db
-          .collection("restaurants")
-          .find(getRestaurantsFindQuery(query))
+        const restaurants = await Restaurants.find(
+          getRestaurantsFindQuery(query)
+        )
           .sort({ [sort]: 1 })
           .skip((page - 1) * limit)
           .limit(limit)
@@ -44,50 +62,49 @@ const resolvers = {
     }
   },
   Mutation: {
-    createRestaurant: async (_, variables, { db }) => {
+    createRestaurant: async (_, variables, { models: { Restaurants } }) => {
       try {
         const { payload } = variables;
-        const result = await db.collection("restaurants").insertOne(payload);
+        const result = await Restaurants.insertOne(payload);
 
         return insertIdField(result.ops[0]);
       } catch (error) {
         throw new ApolloError(error.message);
       }
     },
-    updateRestaurant: async (_, variables, { db }) => {
+    updateRestaurant: async (_, variables, { models: { Restaurants } }) => {
       try {
         const { id, payload } = variables;
 
-        const originalDocument = await db
-          .collection("restaurants")
-          .find({ _id: ObjectId(id) })
-          .toArray();
+        const originalDocument = await Restaurants.find({
+          _id: new ObjectId(id)
+        }).toArray();
 
-        const update = mergeDeepRight(
+        const update = mergeDeepRight<Restaurant, UpdateRestaurantInput>(
           removeObjectIdField(originalDocument[0]),
           payload
         );
 
-        const newDocument = await db
-          .collection("restaurants")
-          .findOneAndUpdate(
-            { _id: ObjectId(id) },
-            { $set: update },
-            { returnOriginal: false }
-          );
+        const newDocument = await Restaurants.findOneAndUpdate(
+          { _id: new ObjectId(id) },
+          { $set: update },
+          { returnOriginal: false }
+        );
 
         return insertIdField(newDocument.value);
       } catch (error) {
         throw new ApolloError(error.message);
       }
     },
-    removeRestaurant: async (parent, variables, { db }) => {
+    removeRestaurant: async (
+      parent,
+      variables,
+      { models: { Restaurants } }
+    ) => {
       try {
         const { id } = variables;
 
-        await db
-          .collection("restaurants")
-          .findOneAndDelete({ _id: ObjectId(id) });
+        await Restaurants.findOneAndDelete({ _id: new ObjectId(id) });
 
         return "Remove Completed!";
       } catch (error) {

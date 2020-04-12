@@ -1,0 +1,14 @@
+schema: ./src/**/*.graphql
+config:
+  maybeValue: T | undefined
+  objectIdType: ObjectId#mongodb
+  contextType: ../server#MyContext
+  mappers:
+    User: ../graphql/mapperTypes#UserMapper
+    Restaurant: ../graphql/mapperTypes#RestaurantMapper
+generates:
+  src/generated/types.ts:
+    plugins:
+      - typescript
+      - typescript-mongodb
+      - typescript-resolvers

@@ -2,10 +2,22 @@ import { ApolloError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import { map, mergeDeepRight } from "ramda";
 
+import {
+  MutationResolvers,
+  QueryResolvers,
+  UpdateUserInput,
+  User,
+  UsersQuery
+} from "../../generated/types";
 import { insertIdField, removeObjectIdField } from "../utils";
 
-const getUsersFindQuery = payload => {
-  let query = {};
+interface UsersFindQuery {
+  name?: RegExp;
+  favorite?: { $in: string[] };
+}
+
+const getUsersFindQuery = (payload: UsersQuery) => {
+  const query: UsersFindQuery = {};
   if (payload.name) {
     query.name = new RegExp(payload.name);
   }
@@ -15,15 +27,18 @@ const getUsersFindQuery = payload => {
   return query;
 };
 
-const resolvers = {
+interface Resolver {
+  Query: QueryResolvers;
+  Mutation: MutationResolvers;
+}
+
+const resolvers: Resolver = {
   Query: {
-    users: async (parent, variables, { db }) => {
+    users: async (parent, variables, { models: { Users } }) => {
       try {
         const { query = {}, page = 1, limit = 10, sort = "_id" } = variables;
 
-        const users = await db
-          .collection("users")
-          .find(getUsersFindQuery(query))
+        const users = await Users.find(getUsersFindQuery(query))
           .sort({ [sort]: 1 })
           .skip((page - 1) * limit)
           .limit(limit)
@@ -41,48 +56,45 @@ const resolvers = {
     }
   },
   Mutation: {
-    createUser: async (_, variables, { db }) => {
+    createUser: async (_, variables, { models: { Users } }) => {
       try {
         const { payload } = variables;
-        const result = await db.collection("users").insertOne(payload);
+        const result = await Users.insertOne(payload);
 
         return insertIdField(result.ops[0]);
       } catch (error) {
         throw new ApolloError(error.message);
       }
     },
-    updateUser: async (_, variables, { db }) => {
+    updateUser: async (_, variables, { models: { Users } }) => {
       try {
         const { id, payload } = variables;
 
-        const originalDocument = await db
-          .collection("users")
-          .find({ _id: ObjectId(id) })
-          .toArray();
+        const originalDocument = await Users.find({
+          _id: new ObjectId(id)
+        }).toArray();
 
-        const update = mergeDeepRight(
+        const update = mergeDeepRight<User, UpdateUserInput>(
           removeObjectIdField(originalDocument[0]),
           payload
         );
 
-        const newDocument = await db
-          .collection("users")
-          .findOneAndUpdate(
-            { _id: ObjectId(id) },
-            { $set: update },
-            { returnOriginal: false }
-          );
+        const newDocument = await Users.findOneAndUpdate(
+          { _id: new ObjectId(id) },
+          { $set: update },
+          { returnOriginal: false }
+        );
 
         return insertIdField(newDocument.value);
       } catch (error) {
         throw new ApolloError(error.message);
       }
     },
-    removeUser: async (parent, variables, { db }) => {
+    removeUser: async (parent, variables, { models: { Users } }) => {
       try {
         const { id } = variables;
 
-        await db.collection("users").findOneAndDelete({ _id: ObjectId(id) });
+        await Users.findOneAndDelete({ _id: new ObjectId(id) });
 
         return "Remove Completed!";
       } catch (error) {
