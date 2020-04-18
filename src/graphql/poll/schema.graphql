@@ -9,22 +9,29 @@ enum PollStatus {
 }
 
 # ----- basic types -----
-type Opinion {
-  member: User!
-  opinion: [Restaurant!]!
+type Poll @entity {
+  id: ID! @id
+  # 投票標題
+  name: String! @column
+  # 成員
+  members: [User!]! @link
+  # 選項
+  options: [Restaurant!]! @link
+  # 意見
+  opinions: [Opinion!] @embedded
+  # 狀態
+  status: PollStatus! @column
+  # 開始時間
+  startTime: DateTime! @column
+  # 限定時間（秒）
+  limitTime: Int @column
+  # 結果
+  result: Restaurant @link
 }
 
-type Poll {
-  id: ID!
-  name: String!
-  members: [User!]!
-  options: [Restaurant!]!
-  opinions: [Opinion!]
-  status: PollStatus!
-  startTime: DateTime!
-  # parse to second
-  limitTime: Int
-  decision: Restaurant
+type Opinion @entity(embedded: true) {
+  member: User! @link
+  options: [Restaurant!]! @link
 }
 
 type PagedPoll {
@@ -38,15 +45,14 @@ type PagedPoll {
 input PollsQuery {
   name: String
   status: PollStatus
-  decision: String
+  result: ID
   isTimeLimit: Boolean
-  isDecided: Boolean
 }
 
 input CreatePollInput {
   name: String!
-  members: [String!]!
-  options: [String!]!
+  members: [ID!]!
+  options: [ID!]!
   # parse to second
   limitTime: Int
 }
@@ -56,22 +62,22 @@ input UpdatePollInput {
 }
 
 input GiveOpinionInput {
-  member: String!
-  opinion: [String!]!
+  member: ID!
+  options: [ID!]!
 }
 
 # ----- query and muate -----
-type Query {
+extend type Query {
   polls(query: PollsQuery, page: Int, limit: Int, sort: String): PagedPoll
   poll(id: ID!): Poll
 }
 
-type Mutation {
+extend type Mutation {
   createPoll(payload: CreatePollInput!): Poll
   updatePoll(id: ID!, payload: UpdatePollInput!): Poll
   removePoll(id: ID!): String!
 
   giveOpinion(id: ID!, payload: GiveOpinionInput!): Poll
-  directDecide(id: ID!, decision: String!): Poll
+  directDecide(id: ID!, result: ID!): Poll
   abandonPoll(id: ID!): Poll!
 }
