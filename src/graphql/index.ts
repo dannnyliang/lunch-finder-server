@@ -24,10 +24,12 @@ export interface Models {
   Users: Collection;
   Restaurants: Collection;
   Groups: Collection;
+  Polls: Collection;
 }
 
 export const getModels = (db: Db): Models => ({
   Users: db.collection("users"),
   Restaurants: db.collection("restaurants"),
-  Groups: db.collection("groups")
+  Groups: db.collection("groups"),
+  Polls: db.collection("polls")
 });
