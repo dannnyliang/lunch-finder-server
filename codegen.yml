@@ -6,6 +6,7 @@ config:
   mappers:
     User: ../graphql/mapperTypes#UserMapper
     Restaurant: ../graphql/mapperTypes#RestaurantMapper
+    Opinion: ../graphql/mapperTypes#OpinionMapper
 generates:
   src/generated/types.ts:
     plugins:

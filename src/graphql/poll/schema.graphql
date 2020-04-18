@@ -1,0 +1,83 @@
+# ----- enums -----
+enum PollStatus {
+  # 正在投票
+  POLLING
+  # 已完成
+  COMPLETED
+  # 已廢棄
+  ABANDONED
+}
+
+# ----- basic types -----
+type Poll @entity {
+  id: ID! @id
+  # 投票標題
+  name: String! @column
+  # 成員
+  members: [User!]! @link
+  # 選項
+  options: [Restaurant!]! @link
+  # 意見
+  opinions: [Opinion!] @embedded
+  # 狀態
+  status: PollStatus! @column
+  # 開始時間
+  startTime: DateTime! @column
+  # 限定時間（秒）
+  limitTime: Int @column
+  # 結果
+  result: Restaurant @link
+}
+
+type Opinion @entity(embedded: true) {
+  member: User! @link
+  options: [Restaurant!]! @link
+}
+
+type PagedPoll {
+  docs: [Poll!]!
+  total: Int!
+  limit: Int!
+  page: Int!
+}
+
+# ----- input types -----
+input PollsQuery {
+  name: String
+  status: PollStatus
+  result: ID
+  isTimeLimit: Boolean
+}
+
+input CreatePollInput {
+  name: String!
+  members: [ID!]!
+  options: [ID!]!
+  # parse to second
+  limitTime: Int
+}
+
+input UpdatePollInput {
+  name: String
+}
+
+input GiveOpinionInput {
+  member: ID!
+  options: [ID!]!
+}
+
+# ----- query and muate -----
+extend type Query {
+  polls(query: PollsQuery, page: Int, limit: Int, sort: String): PagedPoll
+  poll(id: ID!): Poll
+}
+
+extend type Mutation {
+  createPoll(payload: CreatePollInput!): Poll
+  updatePoll(id: ID!, payload: UpdatePollInput!): Poll
+  removePoll(id: ID!): String!
+
+  giveOpinion(id: ID!, payload: GiveOpinionInput!): Poll
+  directDecide(id: ID!, result: ID!): Poll
+  abandonPoll(id: ID!): Poll!
+}
