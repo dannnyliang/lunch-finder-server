@@ -12,12 +12,6 @@ import {
 } from "../../../generated/types";
 import { testUtils } from "../../../test/jest.setup";
 
-const mockUser: UserDbObject = {
-  _id: new ObjectId(),
-  name: "mock-user",
-  favorite: ["restaurant-1", "restaurant-2"]
-};
-
 const mockRestaurants: RestaurantDbObject[] = [
   {
     _id: new ObjectId(),
@@ -30,6 +24,12 @@ const mockRestaurants: RestaurantDbObject[] = [
     address: "mock-address"
   }
 ];
+
+const mockUser: UserDbObject = {
+  _id: new ObjectId(),
+  name: "mock-user",
+  favorite: [mockRestaurants[0]._id, mockRestaurants[1]._id]
+};
 
 const mockPollId = new ObjectId();
 const mockPoll: CreatePollInput & { _id: ObjectId } = {

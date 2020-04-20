@@ -1,19 +1,35 @@
 import { gql } from "apollo-server";
 import { ObjectId } from "mongodb";
-import { omit } from "ramda";
 
 import {
   CreateUserInput,
+  RestaurantDbObject,
   UpdateUserInput,
   UserDbObject
 } from "../../../generated/types";
 import { testUtils } from "../../../test/jest.setup";
 
+const mockRestaurants: RestaurantDbObject[] = [
+  {
+    _id: new ObjectId(),
+    name: "mock-restaurant-1",
+    address: "mock-address"
+  },
+  {
+    _id: new ObjectId(),
+    name: "mock-restaurant-2",
+    address: "mock-address"
+  }
+];
+
 const mockUserId = new ObjectId();
-const mockUser: UserDbObject = {
+const mockUser: CreateUserInput & { _id: ObjectId } = {
   _id: mockUserId,
   name: "mock-name",
-  favorite: ["restaurant-1", "restaurant-2"]
+  favorite: [
+    mockRestaurants[0]._id.toHexString(),
+    mockRestaurants[1]._id.toHexString()
+  ]
 };
 
 describe("[Query.users]", () => {
@@ -31,7 +47,6 @@ describe("[Query.users]", () => {
         users {
           docs {
             name
-            favorite
           }
           page
           total
@@ -46,13 +61,13 @@ describe("[Query.users]", () => {
 
     expect(errors).toBeUndefined();
     expect(data?.users.docs).toHaveLength(1);
-    expect(data?.users.docs[0]).toEqual(omit(["_id"], mockUser));
+    expect(data?.users.docs[0]).toEqual({ name: mockUser.name });
   });
 
   it("should return user list with variable", async () => {
     const {
       testClient: { query },
-      models: { Users }
+      models: { Users, Restaurants }
     } = testUtils.createServer();
 
     /** insert mock data */
@@ -60,19 +75,20 @@ describe("[Query.users]", () => {
       {
         _id: new ObjectId(),
         name: "A",
-        favorite: ["1"]
+        favorite: [mockRestaurants[0]._id]
       },
       {
         _id: new ObjectId(),
         name: "AB",
-        favorite: ["1", "2"]
+        favorite: [mockRestaurants[0]._id, mockRestaurants[1]._id]
       },
       {
         _id: new ObjectId(),
         name: "B",
-        favorite: ["2"]
+        favorite: [mockRestaurants[1]._id]
       }
     ];
+    await Restaurants.insertMany(mockRestaurants);
     await Users.insertMany(mockUsers);
 
     const usersQuery = gql`
@@ -80,7 +96,9 @@ describe("[Query.users]", () => {
         users(query: $query) {
           docs {
             name
-            favorite
+            favorite {
+              name
+            }
           }
           page
           total
@@ -99,7 +117,7 @@ describe("[Query.users]", () => {
 
     const queryByFavorite = await query({
       query: usersQuery,
-      variables: { query: { favorite: ["1"] } }
+      variables: { query: { favorite: [mockRestaurants[1]._id.toHexString()] } }
     });
 
     expect(queryByFavorite.errors).toBeUndefined();
@@ -110,21 +128,27 @@ describe("[Query.users]", () => {
 describe("[Mutation.createUser]", () => {
   it("should create user correctly", async () => {
     const {
-      testClient: { mutate }
+      testClient: { mutate },
+      models: { Restaurants }
     } = testUtils.createServer();
+
+    /** insert mock data */
+    await Restaurants.insertMany(mockRestaurants);
 
     const createMutation = gql`
       mutation createUser($payload: CreateUserInput!) {
         createUser(payload: $payload) {
           name
-          favorite
+          favorite {
+            name
+          }
         }
       }
     `;
 
     const createPayload: CreateUserInput = {
       name: "name",
-      favorite: ["favorite"]
+      favorite: [mockRestaurants[0]._id.toHexString()]
     };
 
     const create = await mutate({
@@ -133,7 +157,10 @@ describe("[Mutation.createUser]", () => {
     });
 
     expect(create.errors).toBeUndefined();
-    expect(create.data?.createUser).toEqual(createPayload);
+    expect(create.data?.createUser).toEqual({
+      name: createPayload.name,
+      favorite: [{ name: mockRestaurants[0].name }]
+    });
   });
 });
 
@@ -141,24 +168,27 @@ describe("[Mutation.updateUser]", () => {
   it("should update user correctly", async () => {
     const {
       testClient: { mutate },
-      models: { Users }
+      models: { Users, Restaurants }
     } = testUtils.createServer();
 
     /** insert mock data */
+    await Restaurants.insertMany(mockRestaurants);
     await Users.insertOne(mockUser);
 
     const updateMutation = gql`
       mutation updateUser($id: ID!, $payload: UpdateUserInput!) {
         updateUser(id: $id, payload: $payload) {
           name
-          favorite
+          favorite {
+            name
+          }
         }
       }
     `;
 
     const updatePayload: UpdateUserInput = {
       name: "updated-name",
-      favorite: ["restaurant-1"]
+      favorite: [mockRestaurants[1]._id.toHexString()]
     };
     const update = await mutate({
       mutation: updateMutation,
@@ -169,7 +199,10 @@ describe("[Mutation.updateUser]", () => {
     });
 
     expect(update.errors).toBeUndefined();
-    expect(update.data?.updateUser).toEqual(updatePayload);
+    expect(update.data?.updateUser).toEqual({
+      name: updatePayload.name,
+      favorite: [{ name: mockRestaurants[1].name }]
+    });
   });
 });
 

@@ -2,7 +2,7 @@
 type User @entity {
   id: ID! @id
   name: String! @column
-  favorite: [String!] @column
+  favorite: [Restaurant!] @link
 }
 
 type PagedUser {
@@ -15,17 +15,17 @@ type PagedUser {
 # ----- input types -----
 input UsersQuery {
   name: String
-  favorite: [String!]
+  favorite: [ID!]
 }
 
 input CreateUserInput {
   name: String!
-  favorite: [String!]!
+  favorite: [ID!]!
 }
 
 input UpdateUserInput {
   name: String
-  favorite: [String!]
+  favorite: [ID!]
 }
 
 # ----- query and muate -----
