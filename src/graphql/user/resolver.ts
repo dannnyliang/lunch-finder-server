@@ -3,17 +3,23 @@ import { ObjectId } from "mongodb";
 import { map, mergeDeepRight } from "ramda";
 
 import {
+  Maybe,
   MutationResolvers,
   QueryResolvers,
   UpdateUserInput,
   User,
+  UserResolvers,
   UsersQuery
 } from "../../generated/types";
-import { insertIdField, removeObjectIdField } from "../utils";
+import {
+  getObjectIdFromString,
+  insertIdField,
+  removeObjectIdField
+} from "../utils";
 
 interface UsersFindQuery {
   name?: RegExp;
-  favorite?: { $in: string[] };
+  favorite?: { $in: ObjectId[] };
 }
 
 const getUsersFindQuery = (payload: UsersQuery) => {
@@ -22,17 +28,33 @@ const getUsersFindQuery = (payload: UsersQuery) => {
     query.name = new RegExp(payload.name);
   }
   if (payload.favorite) {
-    query.favorite = { $in: [...payload.favorite] };
+    query.favorite = { $in: map(getObjectIdFromString, payload.favorite) };
   }
   return query;
 };
 
 interface Resolver {
+  User: UserResolvers;
   Query: QueryResolvers;
   Mutation: MutationResolvers;
 }
 
 const resolvers: Resolver = {
+  User: {
+    favorite: async (user, variable, { models: { Restaurants } }) => {
+      try {
+        // @ts-ignore: UserMapper overwrite User parent type
+        const restaurantIdList = user.favorite as Maybe<string[]>;
+        const restaurants = await Restaurants.find({
+          _id: { $in: map(getObjectIdFromString, restaurantIdList || []) }
+        }).toArray();
+
+        return map(insertIdField, restaurants);
+      } catch (error) {
+        throw new ApolloError(error.message);
+      }
+    }
+  },
   Query: {
     users: async (parent, variables, { models: { Users } }) => {
       try {
