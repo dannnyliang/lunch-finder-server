@@ -9,16 +9,16 @@ import {
 } from "../../../generated/types";
 import { testUtils } from "../../../test/jest.setup";
 
-const mockUser: UserDbObject = {
-  _id: new ObjectId(),
-  name: "mock-user",
-  favorite: ["restaurant-1", "restaurant-2"]
-};
-
 const mockRestaurant: RestaurantDbObject = {
   _id: new ObjectId(),
   name: "mock-restaurant",
   address: "mock-address"
+};
+
+const mockUser: UserDbObject = {
+  _id: new ObjectId(),
+  name: "mock-user",
+  favorite: [mockRestaurant._id]
 };
 
 const mockGroupId = new ObjectId();
